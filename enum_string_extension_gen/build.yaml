@@ -1,0 +1,15 @@
+targets:
+  $default:
+    builders:
+      enum_string_extension_gen|enum_string_extension:
+        enabled: true
+
+builders:
+  enum_string_extension_gen:
+    target: ":enum_string_extension_gen"
+    import: "package:enum_string_extension_gen/enum_string_extension_gen.dart"
+    builder_factories: ["EnumString"]
+    build_extensions: {".dart": ["enum_string_extension_gen.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]

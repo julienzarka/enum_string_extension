@@ -1,0 +1,28 @@
+name: enum_string_extension_test
+description: A new Flutter project.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.6.0 <3.0.0"
+
+dependencies:
+  redux: ^4.0.0
+  flutter:
+    sdk: flutter
+  enum_string_extension:
+    path: ../enum_string_extension
+
+dev_dependencies:
+  build_runner: ^1.7.2
+  flutter_test:
+    sdk: flutter
+  enum_string_extension_gen:
+    path: ../enum_string_extension_gen
+    
+dependency_overrides:
+  enum_string_extension:
+    path: ../enum_string_extension
+
+flutter:
+  uses-material-design: true
