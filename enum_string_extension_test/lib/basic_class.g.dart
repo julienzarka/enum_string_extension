@@ -54,3 +54,33 @@ extension TestEnum3StringExtension on TestEnum3 {
     return AppLocalizations.of(context).value1;
   }
 }
+
+extension TestEnumTestStringExtension on TestEnum {
+  String testText(BuildContext context) {
+    switch (this) {
+      case TestEnum.value1:
+        return AppLocalizations.of(context).testValue1;
+      case TestEnum.value2:
+        return AppLocalizations.of(context).testValue2;
+
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
+}
+
+extension TestEnumTest2StringExtension on TestEnum {
+  String test2Text(BuildContext context) {
+    switch (this) {
+      case TestEnum.value1:
+        return AppLocalizations.of(context).test2Value1;
+      case TestEnum.value2:
+        return AppLocalizations.of(context).test2Value2;
+
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
+}

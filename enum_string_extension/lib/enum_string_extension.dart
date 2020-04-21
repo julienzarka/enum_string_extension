@@ -9,3 +9,11 @@ class EnumString {
   /// Creates a new [EnumString] instance.
   const EnumString();
 }
+
+class EnumKey {
+  final String prefix;
+  final bool exclude;
+  const EnumKey({String prefix, bool exclude})
+      : prefix = prefix ?? '',
+        exclude = exclude ?? false;
+}

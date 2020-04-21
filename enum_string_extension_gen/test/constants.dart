@@ -15,73 +15,91 @@ class EnumString {
 ''';
 
 const String correctInput = r'''
-import 'dart:ui' show Locale;
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
-import 'package:enum_string_extension/enum_string_extension.dart';
-import 'package:flutter/cupertino.dart' show Localizations, BuildContext;
-import 'package:meta/meta.dart' show immutable;
+part of 'basic_class.dart';
 
-part 'basic_class.g.dart';
+// **************************************************************************
+// EnumStringGenerator
+// **************************************************************************
 
-// The localizations delagate must be called AppLocalizations and implement each field of the enum
-class AppLocalizations {
-  AppLocalizations(this.locale) : labels = languages[locale];
+// ignore_for_file: argument_type_not_assignable, implicit_dynamic_type, always_specify_types
 
-  final Locale locale;
-  static final Map<Locale, AppLocalizationsLabels> languages = <Locale, AppLocalizationsLabels>{
-    const Locale.fromSubtags(languageCode: 'en', countryCode: 'US'): const AppLocalizationsLabels(
-      value1: 'Value 1 in english',
-      value2: 'Value 2 in english',
-      value3: 'Value 3 in english',
-    )
-  };
+extension TestEnumStringExtension on TestEnum {
+  String text(BuildContext context) {
+    switch (this) {
+      case TestEnum.value1:
+        return AppLocalizations.of(context).value1;
+      case TestEnum.value2:
+        return AppLocalizations.of(context).value2;
 
-  final AppLocalizationsLabels labels;
-
-  static AppLocalizationsLabels of(BuildContext context) =>
-      Localizations.of<AppLocalizations>(context, AppLocalizations)?.labels;
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
 }
 
-class AppLocalizationsLabels {
-  const AppLocalizationsLabels({
-    this.value1,
-    this.value2,
-    this.value3,
-  });
+extension TestEnum2StringExtension on TestEnum2 {
+  String text(BuildContext context) {
+    switch (this) {
+      case TestEnum2.value1:
+        return AppLocalizations.of(context).value1;
+      case TestEnum2.value2:
+        return AppLocalizations.of(context).value2;
+      case TestEnum2.value3:
+        return AppLocalizations.of(context).value3;
 
-  final String value1;
-  final String value2;
-  final String value3;
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
 }
 
-enum TestEnum3 {
-  value1,
-  value3,
+extension TestEnum3StringExtension on TestEnum3 {
+  String text(BuildContext context) {
+    switch (this) {
+      case TestEnum3.value1:
+        return AppLocalizations.of(context).value1;
+      case TestEnum3.value3:
+        return AppLocalizations.of(context).value3;
+
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
 }
 
-enum TestEnum2 {
-  value1,
-  value2,
-  value3,
+extension TestEnumTestStringExtension on TestEnum {
+  String testText(BuildContext context) {
+    switch (this) {
+      case TestEnum.value1:
+        return AppLocalizations.of(context).testValue1;
+      case TestEnum.value2:
+        return AppLocalizations.of(context).testValue2;
+
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
 }
 
-enum TestEnum {
-  value1,
-  value2,
-}
+extension TestEnumTest2StringExtension on TestEnum {
+  String test2Text(BuildContext context) {
+    switch (this) {
+      case TestEnum.value1:
+        return AppLocalizations.of(context).test2Value1;
+      case TestEnum.value2:
+        return AppLocalizations.of(context).test2Value2;
 
-@immutable
-@enumString
-class BasicClass {
-  const BasicClass({
-    this.test,
-    this.test2,
-    this.test3,
-  });
-
-  final TestEnum test;
-  final TestEnum2 test2;
-  final List<TestEnum3> test3;
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
 }
 ''';
 
@@ -135,6 +153,36 @@ extension TestEnum3StringExtension on TestEnum3 {
         return AppLocalizations.of(context).value1;
       case TestEnum3.value3:
         return AppLocalizations.of(context).value3;
+
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
+}
+
+extension TestEnumTestStringExtension on TestEnum {
+  String testText(BuildContext context) {
+    switch (this) {
+      case TestEnum.value1:
+        return AppLocalizations.of(context).testValue1;
+      case TestEnum.value2:
+        return AppLocalizations.of(context).testValue2;
+
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).value1;
+  }
+}
+
+extension TestEnumTest2StringExtension on TestEnum {
+  String test2Text(BuildContext context) {
+    switch (this) {
+      case TestEnum.value1:
+        return AppLocalizations.of(context).test2Value1;
+      case TestEnum.value2:
+        return AppLocalizations.of(context).test2Value2;
 
       default:
         break;

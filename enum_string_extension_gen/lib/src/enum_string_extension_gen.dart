@@ -1,17 +1,13 @@
-import 'package:analyzer/dart/element/element.dart' show ClassElement, Element, FieldElement;
+import 'package:analyzer/dart/constant/value.dart';
+import 'package:analyzer/dart/element/element.dart' show ClassElement, Element, ElementAnnotation, FieldElement;
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart' show BuildStep;
 import 'package:enum_string_extension/enum_string_extension.dart';
 import 'package:source_gen/source_gen.dart' show GeneratorForAnnotation, ConstantReader;
 
 extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1)}";
-  }
-
-  String unCapitalize() {
-    return "${this[0].toLowerCase()}${this.substring(1)}";
-  }
+  String capitalize() => this != null && this.isNotEmpty ? '${this[0].toUpperCase()}${this.substring(1)}' : '';
+  String unCapitalize() => this != null && this.isNotEmpty ? '${this[0].toLowerCase()}${this.substring(1)}' : '';
 }
 
 /// A `Generator` for `package:build_runner`
@@ -23,7 +19,7 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
     BuildStep buildStep,
   ) {
     if (element is! ClassElement) throw "$element is not a ClassElement";
-    final List<DartType> sortedEnums = _sortedEnums(element as ClassElement);
+    final List<_LocalFields> sortedEnums = _sortedEnums(element as ClassElement);
 
     //Since we do not support generic types, we must suppress these checks
     final ignored_analyzer_rules = '''
@@ -37,8 +33,6 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
     ''';
   }
 
-  final _enumMapExpando = Expando<Map<FieldElement, dynamic>>();
-
   /// If [targetType] is an enum, returns a [Map] of the [FieldElement] instances
   /// associated with the enum values mapped to the [String] values that represent
   /// the serialized output.
@@ -50,7 +44,68 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
   /// Handle enum inside lists, List<enum>.
   ///
   /// If [targetType] is not an enum, `null` is returned.
-  Map<FieldElement, dynamic> enumFieldsMap(DartType targetType) {
+
+  String _generateEnumString(List<_LocalFields> sortedEnums) {
+    String result = '';
+    for (_LocalFields t in sortedEnums) {
+      if (t.enumMap == null) continue;
+      if (t.enumKey.exclude == true) continue;
+      result += '''
+      extension ${t.type.getDisplayString()}${t.enumKey.prefix.capitalize()}StringExtension on ${t.type.getDisplayString()} {
+        String ${t.enumKey.prefix.isEmpty ? 'text' : '${t.enumKey.prefix.unCapitalize()}Text'}(BuildContext context) {
+          switch(this) {
+            ${t.enumMap.entries.map((e) => 'case ${t.type.element.name}.${e.key.name}: return AppLocalizations.of'
+              '(context).${t.enumKey.prefix.isEmpty ? e.key.name.unCapitalize() : '${t.enumKey.prefix.unCapitalize()}${e.key.name.capitalize()}'};\n').join()}
+            default:
+              break;
+          }
+          return AppLocalizations.of(context).${t.enumMap.keys.first.name};
+        }
+      }
+      
+      ''';
+    }
+    return result;
+  }
+
+  List<_LocalFields> _sortedEnums(ClassElement element) {
+    assert(element is ClassElement);
+    return element.fields
+        .map<_LocalFields>((FieldElement e) => _LocalFields(
+            type: e.type.isDartCoreList ? (e.type as ParameterizedType)?.typeArguments?.first : e.type,
+            enumKey: e.metadata.isNotEmpty
+                ? e.metadata
+                    .map<EnumKey>((ElementAnnotation element) {
+                      DartObject x = element.computeConstantValue();
+                      return EnumKey(
+                          prefix: x.getField('prefix')?.toStringValue(), exclude: x.getField('exclude')?.toBoolValue());
+                    })
+                    .where((EnumKey x) => x != null)
+                    ?.toList()
+                    ?.first
+                : null))
+        .toList()
+        .toSet()
+        .toList();
+  }
+}
+
+class _LocalFields {
+  _LocalFields({this.type, EnumKey enumKey}) : enumKey = enumKey ?? const EnumKey() {
+    enumMap = _enumFieldsMap(type);
+  }
+
+  final DartType type;
+  final EnumKey enumKey;
+  Map<FieldElement, dynamic> enumMap;
+
+  final _enumMapExpando = Expando<Map<FieldElement, dynamic>>();
+
+  String toString() {
+    return '>>> To String: $type/${enumKey.prefix}/${enumKey.exclude}';
+  }
+
+  Map<FieldElement, dynamic> _enumFieldsMap(DartType targetType) {
     MapEntry<FieldElement, dynamic> _generateEntry(FieldElement fe) {
       dynamic fieldValue = fe.name;
       final entry = MapEntry(fe, fieldValue);
@@ -64,33 +119,10 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
     return null;
   }
 
-  String _generateEnumString(List<DartType> sortedEnums) {
-    String result = '';
-    for (DartType t in sortedEnums) {
-      final enumMap = enumFieldsMap(t);
-      if (enumMap == null) continue;
-      result += '''
-      extension ${t.getDisplayString()}StringExtension on ${t.getDisplayString()} {
-        String text(BuildContext context) {
-          switch(this) {
-            ${enumMap.entries.map((e) => 'case ${t.element.name}.${e.key.name}: return AppLocalizations.of(context).${e.key.name};\n').join()}
-            default:
-              break;
-          }
-          return AppLocalizations.of(context).${enumMap.keys.first.name};
-        }
-      }
-      
-      ''';
-    }
-    return result;
-  }
+  @override
+  bool operator ==(Object other) =>
+      other is _LocalFields && other.type == type && other.enumKey.prefix.capitalize() == enumKey.prefix.capitalize();
 
-  List<DartType> _sortedEnums(ClassElement element) {
-    assert(element is ClassElement);
-    List<DartType> t = element.fields.map<DartType>((FieldElement e) => e.type).toList();
-    return t
-        .map<DartType>((DartType e) => e.isDartCoreList ? (e as ParameterizedType).typeArguments.first : e)
-        .toList();
-  }
+  @override
+  int get hashCode => type.hashCode;
 }
