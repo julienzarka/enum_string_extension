@@ -47,6 +47,8 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
   /// If the enum value is annotated with [JsonKey], then the `name` property is
   /// used if it's set and not `null`.
   ///
+  /// Handle enum inside lists, List<enum>.
+  ///
   /// If [targetType] is not an enum, `null` is returned.
   Map<FieldElement, dynamic> enumFieldsMap(DartType targetType) {
     MapEntry<FieldElement, dynamic> _generateEntry(FieldElement fe) {
@@ -80,13 +82,15 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
       }
       
       ''';
-      return result;
     }
-    return '';
+    return result;
   }
 
   List<DartType> _sortedEnums(ClassElement element) {
     assert(element is ClassElement);
-    return element.fields.map<DartType>((FieldElement e) => e.type).toList();
+    List<DartType> t = element.fields.map<DartType>((FieldElement e) => e.type).toList();
+    return t
+        .map<DartType>((DartType e) => e.isDartCoreList ? (e as ParameterizedType).typeArguments.first : e)
+        .toList();
   }
 }

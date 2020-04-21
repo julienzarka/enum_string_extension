@@ -15,6 +15,7 @@ class AppLocalizations {
     const Locale.fromSubtags(languageCode: 'en', countryCode: 'US'): const AppLocalizationsLabels(
       value1: 'Value 1 in english',
       value2: 'Value 2 in english',
+      value3: 'Value 3 in english',
     )
   };
 
@@ -25,10 +26,26 @@ class AppLocalizations {
 }
 
 class AppLocalizationsLabels {
-  const AppLocalizationsLabels({this.value1, this.value2});
+  const AppLocalizationsLabels({
+    this.value1,
+    this.value2,
+    this.value3,
+  });
 
   final String value1;
   final String value2;
+  final String value3;
+}
+
+enum TestEnum3 {
+  value1,
+  value3,
+}
+
+enum TestEnum2 {
+  value1,
+  value2,
+  value3,
 }
 
 enum TestEnum {
@@ -39,7 +56,13 @@ enum TestEnum {
 @immutable
 @enumString
 class BasicClass {
-  const BasicClass({this.test});
+  const BasicClass({
+    this.test,
+    this.test2,
+    this.test3,
+  });
 
   final TestEnum test;
+  final TestEnum2 test2;
+  final List<TestEnum3> test3;
 }
