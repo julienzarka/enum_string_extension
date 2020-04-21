@@ -49,60 +49,79 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
     String result = '';
     for (_LocalFields t in sortedEnums) {
       if (t.enumMap == null) continue;
-      if (t.enumKey.exclude == true) continue;
-      result += '''
-      extension ${t.type.getDisplayString()}${t.enumKey.prefix.capitalize()}StringExtension on ${t.type.getDisplayString()} {
-        String ${t.enumKey.prefix.isEmpty ? 'text' : '${t.enumKey.prefix.unCapitalize()}Text'}(BuildContext context) {
+      for (EnumKey ek in t.enumKey) {
+        result += '''
+      extension ${t.type.getDisplayString()}${ek.prefix.capitalize()}StringExtension on ${t.type.getDisplayString()} {
+        String ${ek.prefix.isEmpty ? 'text' : '${ek.prefix.unCapitalize()}Text'}(BuildContext context) {
           switch(this) {
             ${t.enumMap.entries.map((e) => 'case ${t.type.element.name}.${e.key.name}: return AppLocalizations.of'
-              '(context).${t.enumKey.prefix.isEmpty ? e.key.name.unCapitalize() : '${t.enumKey.prefix.unCapitalize()}${e.key.name.capitalize()}'};\n').join()}
+                '(context).${ek.prefix.isEmpty ? e.key.name.unCapitalize() : '${ek.prefix.unCapitalize()}${e.key.name.capitalize()}'};').join('\n')}
             default:
               break;
           }
-          return AppLocalizations.of(context).${t.enumMap.keys.first.name};
+          return AppLocalizations.of(context).${ek.prefix.isEmpty ? t.enumMap.keys.first.name.unCapitalize() : '${ek.prefix.unCapitalize()}${t.enumMap.keys.first.name.capitalize()}'};
         }
       }
       
       ''';
+      }
     }
     return result;
   }
 
   List<_LocalFields> _sortedEnums(ClassElement element) {
     assert(element is ClassElement);
-    return element.fields
+    List<_LocalFields> x = element.fields
         .map<_LocalFields>((FieldElement e) => _LocalFields(
             type: e.type.isDartCoreList ? (e.type as ParameterizedType)?.typeArguments?.first : e.type,
             enumKey: e.metadata.isNotEmpty
                 ? e.metadata
                     .map<EnumKey>((ElementAnnotation element) {
-                      DartObject x = element.computeConstantValue();
-                      return EnumKey(
-                          prefix: x.getField('prefix')?.toStringValue(), exclude: x.getField('exclude')?.toBoolValue());
+                      if (element.toSource().startsWith('@EnumKey(')) {
+                        DartObject x = element.computeConstantValue();
+                        bool exclude = x.getField('exclude')?.toBoolValue() ?? false;
+                        if (exclude != true) {
+                          return EnumKey(prefix: x.getField('prefix')?.toStringValue()?.unCapitalize(), exclude: false);
+                        }
+                      }
+                      // Not our enum or excluded
+                      return null;
                     })
                     .where((EnumKey x) => x != null)
                     ?.toList()
-                    ?.first
                 : null))
-        .toList()
-        .toSet()
         .toList();
+    x.sort((_LocalFields a, _LocalFields b) => a.type.toString().compareTo(b.type.toString()));
+    List<_LocalFields> y = <_LocalFields>[];
+    for (_LocalFields field in x) {
+      List<_LocalFields> occurrence = x.where((element) => field.type == element.type).toList();
+      if (field != occurrence.first) continue;
+      for (_LocalFields field2 in occurrence) {
+        if (field2 != field) {
+          field.enumKey.addAll(field2.enumKey);
+        }
+      }
+      List<String> prefixes = field.enumKey.map<String>((e) => e.prefix).toList();
+      field.enumKey = prefixes.toSet().toList().map<EnumKey>((e) => EnumKey(prefix: e)).toList();
+      y.add(field);
+    }
+    return y;
   }
 }
 
 class _LocalFields {
-  _LocalFields({this.type, EnumKey enumKey}) : enumKey = enumKey ?? const EnumKey() {
+  _LocalFields({this.type, List<EnumKey> enumKey}) : enumKey = enumKey ?? <EnumKey>[EnumKey()] {
     enumMap = _enumFieldsMap(type);
   }
 
   final DartType type;
-  final EnumKey enumKey;
+  List<EnumKey> enumKey;
   Map<FieldElement, dynamic> enumMap;
 
   final _enumMapExpando = Expando<Map<FieldElement, dynamic>>();
 
   String toString() {
-    return '>>> To String: $type/${enumKey.prefix}/${enumKey.exclude}';
+    return '>>> LocalField<$type>: ${enumKey.map((e) => e.prefix).join(',\n')}';
   }
 
   Map<FieldElement, dynamic> _enumFieldsMap(DartType targetType) {
@@ -118,11 +137,4 @@ class _LocalFields {
     }
     return null;
   }
-
-  @override
-  bool operator ==(Object other) =>
-      other is _LocalFields && other.type == type && other.enumKey.prefix.capitalize() == enumKey.prefix.capitalize();
-
-  @override
-  int get hashCode => type.hashCode;
 }

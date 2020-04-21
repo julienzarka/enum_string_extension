@@ -2,6 +2,7 @@ import 'dart:ui' show Locale;
 
 import 'package:enum_string_extension/enum_string_extension.dart';
 import 'package:flutter/cupertino.dart' show Localizations, BuildContext;
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart' show immutable;
 
 part 'basic_class.g.dart';
@@ -20,6 +21,10 @@ class AppLocalizations {
       testValue2: 'TestValue 2 in english',
       test2Value1: 'Test2Value 1 in english',
       test2Value2: 'Test2Value 2 in english',
+      myTestValue1: 'TestValue 1 in english',
+      myTestValue2: 'TestValue 2 in english',
+      mySecondTestValue1: 'TestValue 1 in english',
+      mySecondTestValue2: 'TestValue 2 in english',
     )
   };
 
@@ -38,6 +43,12 @@ class AppLocalizationsLabels {
     this.testValue2,
     this.test2Value1,
     this.test2Value2,
+    this.myTestValue1,
+    this.myTestValue2,
+    this.mySecondTestValue1,
+    this.mySecondTestValue2,
+    this.variantValue5,
+    this.variantValue6,
   });
 
   final String value1;
@@ -47,6 +58,12 @@ class AppLocalizationsLabels {
   final String testValue2;
   final String test2Value1;
   final String test2Value2;
+  final String myTestValue1;
+  final String myTestValue2;
+  final String mySecondTestValue1;
+  final String mySecondTestValue2;
+  final String variantValue5;
+  final String variantValue6;
 }
 
 enum TestEnum4 {
@@ -55,8 +72,8 @@ enum TestEnum4 {
 }
 
 enum TestEnum3 {
-  value1,
-  value3,
+  value5,
+  value6,
 }
 
 enum TestEnum2 {
@@ -91,11 +108,14 @@ class BasicClass {
   final TestEnum test;
   // Should generate text() TestEnum2
   final TestEnum2 test2;
-  // Should generate text() for TestEnum3
+  // Should generate variantText() for TestEnum3 - not the text()
+  @EnumKey(prefix: 'variant')
   final List<TestEnum3> test3;
 
-  // Should generate testText() for TestEnum
-  @EnumKey(prefix: 'test')
+  // Should generate myTestText() for TestEnum - ignore other annotations
+  @JsonKey(ignore: true)
+  @EnumKey(prefix: 'myTest')
+  @EnumKey(prefix: 'mySecondTest')
   final TestEnum test4;
 // Should generate testText() for TestEnum
   @EnumKey(prefix: 'test2')
