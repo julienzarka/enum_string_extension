@@ -60,9 +60,11 @@ class BasicClass {
     this.test,
     this.test2,
     this.test3,
+    this.test4,
   });
 
   final TestEnum test;
   final TestEnum2 test2;
   final List<TestEnum3> test3;
+  final TestEnum test4;
 }
