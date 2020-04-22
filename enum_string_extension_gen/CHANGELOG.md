@@ -1,3 +1,7 @@
+## 0.0.4
+
+* Fix bugs in `EnumKey` handling (unique, determinism) and in some code generated
+
 ## 0.0.3
 
 * Add support for `EnumKey` with prefix parameter and exclude option

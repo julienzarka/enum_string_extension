@@ -1,5 +1,5 @@
 name: enum_string_extension
-version: 0.0.3
+version: 0.0.4
 description: Annotation for generating `enumString` extensions code using `enum_string_extension_gen`.
 homepage: https://github.com/julienzarka/enum_string_extension/tree/master/enum_string_extension
 repository: https://github.com/julienzarka/enum_string_extension
@@ -11,6 +11,6 @@ environment:
 dev_dependencies:
   build_runner: ">=1.0.0 <2.0.0"
   test: "<2.0.0"
-  enum_string_extension_gen: ">=0.0.3 <1.0.0"
+  enum_string_extension_gen: ">=0.0.4 <1.0.0"
   #enum_string_extension_gen:
   #  path: ../enum_string_extension_gen
