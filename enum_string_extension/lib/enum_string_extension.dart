@@ -12,8 +12,10 @@ class EnumString {
 
 class EnumKey {
   final String prefix;
+  final String namespace;
   final bool exclude;
-  const EnumKey({String prefix, bool exclude})
+  const EnumKey({String prefix, bool exclude, String namespace})
       : prefix = prefix ?? '',
-        exclude = exclude ?? false;
+        exclude = exclude ?? false,
+        namespace = namespace ?? '';
 }

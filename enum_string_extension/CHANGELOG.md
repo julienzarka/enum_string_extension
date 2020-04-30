@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Add support for namespace. If a namespace is declared on one of the keys, it will be forced for all keys with the same name.
+
 ## 0.0.4
 
 * Fix bugs in `EnumKey` handling (unique, determinism) and in some code generated

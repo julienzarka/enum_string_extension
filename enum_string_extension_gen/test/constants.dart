@@ -15,10 +15,12 @@ class EnumString {
 
 class EnumKey {
   final String prefix;
+  final String namespace;
   final bool exclude;
-  const EnumKey({String prefix, bool exclude})
+  const EnumKey({String prefix, bool exclude, String namespace})
       : prefix = prefix ?? '',
-        exclude = exclude ?? false;
+        exclude = exclude ?? false,
+        namespace = namespace ?? '';
 }
 ''';
 
@@ -50,6 +52,14 @@ class AppLocalizations {
       myTestValue2: 'TestValue 2 in english',
       mySecondTestValue1: 'TestValue 1 in english',
       mySecondTestValue2: 'TestValue 2 in english',
+      myNamespace: AppLocalizations_Labels_myNamespace(
+        value1: 'Value 1 in english',
+        value2: 'Value 2 in english',
+        value3: 'Value 3 in english',
+        nameTestValue1: 'Value 1 in english',
+        nameTestValue2: 'Value 2 in english',
+        nameTestValue3: 'Value 3 in english',
+      ),
     )
   };
 
@@ -57,6 +67,24 @@ class AppLocalizations {
 
   static AppLocalizationsLabels of(BuildContext context) =>
       Localizations.of<AppLocalizations>(context, AppLocalizations)?.labels;
+}
+
+class AppLocalizations_Labels_myNamespace {
+  const AppLocalizations_Labels_myNamespace({
+    this.value1,
+    this.value2,
+    this.value3,
+    this.nameTestValue1,
+    this.nameTestValue2,
+    this.nameTestValue3,
+  });
+
+  final String value1;
+  final String value2;
+  final String value3;
+  final String nameTestValue1;
+  final String nameTestValue2;
+  final String nameTestValue3;
 }
 
 class AppLocalizationsLabels {
@@ -74,6 +102,7 @@ class AppLocalizationsLabels {
     this.mySecondTestValue2,
     this.variantValue5,
     this.variantValue6,
+    this.myNamespace,
   });
 
   final String value1;
@@ -89,6 +118,7 @@ class AppLocalizationsLabels {
   final String mySecondTestValue2;
   final String variantValue5;
   final String variantValue6;
+  final AppLocalizations_Labels_myNamespace myNamespace;
 }
 
 enum TestEnum4 {
@@ -102,6 +132,12 @@ enum TestEnum3 {
 }
 
 enum TestEnum2 {
+  value1,
+  value2,
+  value3,
+}
+
+enum TestEnum6 {
   value1,
   value2,
   value3,
@@ -123,10 +159,13 @@ class BasicClass {
     this.test5,
     this.test6,
     this.test7,
-    this.test8,
-    this.test9,
-    this.test10,
-    this.test11,
+    this.test20,
+    this.test21,
+    this.test22,
+    this.test23,
+    this.test24,
+    this.test25,
+    this.test26,
   });
 
   // Should generate text() for TestEnum
@@ -142,25 +181,36 @@ class BasicClass {
   @EnumKey(prefix: 'myTest')
   @EnumKey(prefix: 'mySecondTest')
   final TestEnum test4;
-// Should generate testText() for TestEnum
+  // Should generate testText() for TestEnum
   @EnumKey(prefix: 'test2')
   final TestEnum test5;
+
+  // Should generate text() for TestEnum6 with namespace
+  @EnumKey(namespace: 'myNamespace')
+  final TestEnum6 test6;
+  // Should generate nameTestText() for TestEnum6 with namespace
+  @EnumKey(namespace: 'myNamespace', prefix: 'nameTest')
+  final TestEnum6 test7;
 
   // Should not generate code
 
   // Duplicate prefix
-  final TestEnum test6;
+  final TestEnum test20;
   // Should not generate duplicate text() for TestEnum
   @EnumKey(prefix: 'test')
-  final TestEnum test7;
+  final TestEnum test21;
   @EnumKey(prefix: 'Test')
-  final TestEnum test8;
+  final TestEnum test22;
   // Not enum fields
-  final String test9;
-  final List<String> test10;
+  final String test23;
+  final List<String> test24;
   // Excluded enum
   @EnumKey(exclude: true)
-  final TestEnum4 test11;
+  final TestEnum4 test25;
+
+  // Should not generate nameTestText() for TestEnum6 without the namespace previously declared
+  @EnumKey(prefix: 'nameTest')
+  final TestEnum6 test26;
 }
 ''';
 
@@ -272,6 +322,38 @@ extension TestEnum3VariantStringExtension on TestEnum3 {
         break;
     }
     return AppLocalizations.of(context).variantValue5;
+  }
+}
+
+extension TestEnum6StringExtension on TestEnum6 {
+  String text(BuildContext context) {
+    switch (this) {
+      case TestEnum6.value1:
+        return AppLocalizations.of(context).myNamespace.value1;
+      case TestEnum6.value2:
+        return AppLocalizations.of(context).myNamespace.value2;
+      case TestEnum6.value3:
+        return AppLocalizations.of(context).myNamespace.value3;
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).myNamespace.value1;
+  }
+}
+
+extension TestEnum6NameTestStringExtension on TestEnum6 {
+  String nameTestText(BuildContext context) {
+    switch (this) {
+      case TestEnum6.value1:
+        return AppLocalizations.of(context).myNamespace.nameTestValue1;
+      case TestEnum6.value2:
+        return AppLocalizations.of(context).myNamespace.nameTestValue2;
+      case TestEnum6.value3:
+        return AppLocalizations.of(context).myNamespace.nameTestValue3;
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).myNamespace.nameTestValue1;
   }
 }
 

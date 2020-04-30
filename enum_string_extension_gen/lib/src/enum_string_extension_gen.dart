@@ -55,11 +55,13 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
         String ${ek.prefix.isEmpty ? 'text' : '${ek.prefix.unCapitalize()}Text'}(BuildContext context) {
           switch(this) {
             ${t.enumMap.entries.map((e) => 'case ${t.type.element.name}.${e.key.name}: return AppLocalizations.of'
-                '(context).${ek.prefix.isEmpty ? e.key.name.unCapitalize() : '${ek.prefix.unCapitalize()}${e.key.name.capitalize()}'};').join('\n')}
+                '(context).${ek.namespace.isEmpty ? '' : '${ek.namespace}.'}${ek.prefix.isEmpty ? e.key.name.unCapitalize() : ''
+                    '${ek.prefix.unCapitalize()}${e.key.name.capitalize()}'};').join('\n')}
             default:
               break;
           }
-          return AppLocalizations.of(context).${ek.prefix.isEmpty ? t.enumMap.keys.first.name.unCapitalize() : '${ek.prefix.unCapitalize()}${t.enumMap.keys.first.name.capitalize()}'};
+          return AppLocalizations.of(context).${ek.namespace.isEmpty ? '' : '${ek.namespace}.'}
+          ${ek.prefix.isEmpty ? t.enumMap.keys.first.name.unCapitalize() : '${ek.prefix.unCapitalize()}${t.enumMap.keys.first.name.capitalize()}'};
         }
       }
       
@@ -81,7 +83,10 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
                         DartObject x = element.computeConstantValue();
                         bool exclude = x.getField('exclude')?.toBoolValue() ?? false;
                         if (exclude != true) {
-                          return EnumKey(prefix: x.getField('prefix')?.toStringValue()?.unCapitalize(), exclude: false);
+                          return EnumKey(
+                              namespace: x.getField('namespace')?.toStringValue()?.unCapitalize(),
+                              prefix: x.getField('prefix')?.toStringValue()?.unCapitalize(),
+                              exclude: false);
                         }
                       }
                       // Not our enum or excluded
@@ -91,6 +96,7 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
                     ?.toList()
                 : null))
         .toList();
+
     x.sort((_LocalFields a, _LocalFields b) => a.type.toString().compareTo(b.type.toString()));
     List<_LocalFields> y = <_LocalFields>[];
     for (_LocalFields field in x) {
@@ -102,7 +108,9 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
         }
       }
       List<String> prefixes = field.enumKey.map<String>((e) => e.prefix).toList();
-      field.enumKey = prefixes.toSet().toList().map<EnumKey>((e) => EnumKey(prefix: e)).toList();
+      List<String> namespaces = field.enumKey.map<String>((e) => e.namespace).toList();
+      String namespace = namespaces.isEmpty ? '' : namespaces.first;
+      field.enumKey = prefixes.toSet().toList().map<EnumKey>((e) => EnumKey(prefix: e, namespace: namespace)).toList();
       y.add(field);
     }
     return y;
@@ -121,7 +129,7 @@ class _LocalFields {
   final _enumMapExpando = Expando<Map<FieldElement, dynamic>>();
 
   String toString() {
-    return '>>> LocalField<$type>: ${enumKey.map((e) => e.prefix).join(',\n')}';
+    return '>>> LocalField<$type>: ${enumKey.map((e) => '${e.namespace}${e.namespace.isNotEmpty ? '.' : ''}${e.prefix}').join(',\n')}';
   }
 
   Map<FieldElement, dynamic> _enumFieldsMap(DartType targetType) {

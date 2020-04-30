@@ -107,3 +107,35 @@ extension TestEnum3VariantStringExtension on TestEnum3 {
     return AppLocalizations.of(context).variantValue5;
   }
 }
+
+extension TestEnum6StringExtension on TestEnum6 {
+  String text(BuildContext context) {
+    switch (this) {
+      case TestEnum6.value1:
+        return AppLocalizations.of(context).myNamespace.value1;
+      case TestEnum6.value2:
+        return AppLocalizations.of(context).myNamespace.value2;
+      case TestEnum6.value3:
+        return AppLocalizations.of(context).myNamespace.value3;
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).myNamespace.value1;
+  }
+}
+
+extension TestEnum6NameTestStringExtension on TestEnum6 {
+  String nameTestText(BuildContext context) {
+    switch (this) {
+      case TestEnum6.value1:
+        return AppLocalizations.of(context).myNamespace.nameTestValue1;
+      case TestEnum6.value2:
+        return AppLocalizations.of(context).myNamespace.nameTestValue2;
+      case TestEnum6.value3:
+        return AppLocalizations.of(context).myNamespace.nameTestValue3;
+      default:
+        break;
+    }
+    return AppLocalizations.of(context).myNamespace.nameTestValue1;
+  }
+}
