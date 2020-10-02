@@ -54,13 +54,13 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
       extension ${t.type.getDisplayString()}${ek.prefix.capitalize()}StringExtension on ${t.type.getDisplayString()} {
         String ${ek.prefix.isEmpty ? 'text' : '${ek.prefix.unCapitalize()}Text'}(BuildContext context) {
           switch(this) {
-            ${t.enumMap.entries.map((e) => 'case ${t.type.element.name}.${e.key.name}: return AppLocalizations.of'
+            ${t.enumMap.entries.map((e) => 'case ${t.type.element.name}.${e.key.name}: return ${ek.localization}.of'
                 '(context).${ek.namespace.isEmpty ? '' : '${ek.namespace}.'}${ek.prefix.isEmpty ? e.key.name.unCapitalize() : ''
                     '${ek.prefix.unCapitalize()}${e.key.name.capitalize()}'};').join('\n')}
             default:
               break;
           }
-          return AppLocalizations.of(context).${ek.namespace.isEmpty ? '' : '${ek.namespace}.'}
+          return ${ek.localization}.of(context).${ek.namespace.isEmpty ? '' : '${ek.namespace}.'}
           ${ek.prefix.isEmpty ? t.enumMap.keys.first.name.unCapitalize() : '${ek.prefix.unCapitalize()}${t.enumMap.keys.first.name.capitalize()}'};
         }
       }
@@ -84,9 +84,11 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
                         bool exclude = x.getField('exclude')?.toBoolValue() ?? false;
                         if (exclude != true) {
                           return EnumKey(
-                              namespace: x.getField('namespace')?.toStringValue()?.unCapitalize(),
-                              prefix: x.getField('prefix')?.toStringValue()?.unCapitalize(),
-                              exclude: false);
+                            namespace: x.getField('namespace')?.toStringValue()?.unCapitalize(),
+                            prefix: x.getField('prefix')?.toStringValue()?.unCapitalize(),
+                            exclude: false,
+                            localization: x.getField('localization')?.toStringValue(),
+                          );
                         }
                       }
                       // Not our enum or excluded
@@ -109,8 +111,18 @@ class EnumStringGenerator extends GeneratorForAnnotation<EnumString> {
       }
       List<String> prefixes = field.enumKey.map<String>((e) => e.prefix).toList();
       List<String> namespaces = field.enumKey.map<String>((e) => e.namespace).toList();
+      List<String> localizations = field.enumKey.map<String>((e) => e.localization).toList();
       String namespace = namespaces.isEmpty ? '' : namespaces.first;
-      field.enumKey = prefixes.toSet().toList().map<EnumKey>((e) => EnumKey(prefix: e, namespace: namespace)).toList();
+      String localization = localizations.isEmpty ? 'AppLocalizations' : localizations.first;
+      field.enumKey = prefixes
+          .toSet()
+          .toList()
+          .map<EnumKey>((e) => EnumKey(
+                prefix: e,
+                namespace: namespace,
+                localization: localization,
+              ))
+          .toList();
       y.add(field);
     }
     return y;

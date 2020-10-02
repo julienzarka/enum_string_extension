@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Add localization class name override capability.
+
 ## 0.0.5
 
 * Add support for namespace. If a namespace is declared on one of the keys, it will be forced for all keys with the same name.
