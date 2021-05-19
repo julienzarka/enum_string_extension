@@ -16,8 +16,12 @@ class EnumKey {
   final bool exclude;
   final String localization;
 
-  const EnumKey({String prefix, bool exclude, String namespace, String localization})
-      : prefix = prefix ?? '',
+  const EnumKey({
+    String? prefix,
+    bool? exclude,
+    String? namespace,
+    String? localization,
+  })  : prefix = prefix ?? '',
         exclude = exclude ?? false,
         namespace = namespace ?? '',
         localization = localization ?? 'AppLocalizations';

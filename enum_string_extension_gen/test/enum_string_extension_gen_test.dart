@@ -1,10 +1,12 @@
 import 'dart:async';
-import 'package:test/test.dart';
+
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
+import 'package:enum_string_extension_gen/src/enum_string_extension_gen.dart';
 import 'package:logging/logging.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:enum_string_extension_gen/src/enum_string_extension_gen.dart';
+import 'package:test/test.dart';
+
 import 'constants.dart';
 
 //Run the tests with `pub run test` as we don't use the flutter dependencies here
@@ -26,7 +28,7 @@ Future<String> _generate(String source) async {
     '$pkgName|lib/basic_class.dart': source,
   };
 
-  String error;
+  String? error;
   void captureError(LogRecord logRecord) {
     error = logRecord.error.toString();
   }

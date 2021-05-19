@@ -1,3 +1,7 @@
+## 1.0.0
+
+* Move to flutter 2
+
 ## 0.0.6
 
 * Add localization class name override capability.
